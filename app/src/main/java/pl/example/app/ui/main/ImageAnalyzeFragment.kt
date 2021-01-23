@@ -1,6 +1,5 @@
 package pl.example.app.ui.main
 
-import android.graphics.drawable.BitmapDrawable
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -11,12 +10,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONArray
+import org.json.JSONObject
 import pl.example.app.CognitiveService
 import pl.example.app.MainActivity
 import pl.example.app.R
 
-
-class PlaceholderFragment : Fragment(R.layout.fragment_one) {
+class ImageAnalyzeFragment : Fragment(R.layout.fragment_one) {
 
     private val cognitiveService = CognitiveService()
     private val subscriptions = CompositeDisposable()
@@ -34,14 +33,13 @@ class PlaceholderFragment : Fragment(R.layout.fragment_one) {
                 setImageBitmap(it)
             }
 
-            cognitiveService.faceRecognition(it)
+            cognitiveService.analyzeImage(it)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { result, error ->
                     if (error == null) {
                         view?.findViewById<TextView>(R.id.textView)?.run {
-                            JSONArray(result).let { array ->
-                                drawRectangle(array)
+                            JSONObject(result).let { array ->
                                 text = array.toString(4)
                             }
                         }
@@ -51,26 +49,6 @@ class PlaceholderFragment : Fragment(R.layout.fragment_one) {
                     }
                 }
         }.addTo(subscriptions)
-    }
-
-    private fun drawRectangle(result: JSONArray) {
-        view?.findViewById<ImageView>(R.id.image_view)?.let { imageView ->
-            (imageView.drawable as? BitmapDrawable?)?.bitmap?.let { image ->
-                if (!result.isNull(0)){
-                    result.getJSONObject(0).getJSONObject("faceRectangle").let { area ->
-                        imageView.setImageBitmap(
-                            drawFaceRectangleOnBitmap(
-                                image,
-                                area.getString("top").toFloat(),
-                                area.getString("left").toFloat(),
-                                area.getString("width").toFloat(),
-                                area.getString("height").toFloat(),
-                            )
-                        )
-                    }
-                }
-            }
-        }
     }
 
     override fun onPause() {
