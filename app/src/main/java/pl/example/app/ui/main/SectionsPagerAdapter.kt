@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 
 private val TAB_TITLES = arrayOf(
     "Face recognition",
-    "Text Recognition"
+    "Image Analysis"
 )
 
 class SectionsPagerAdapter(private val context: Context, fm: FragmentManager)
